@@ -1,5 +1,7 @@
 Most Significant PGA Tour Major Metrics
 
+Andrew Raymond
+
 ## Abstract (1 paragraph)
 
 Here is where you put your 30-second pitch. 

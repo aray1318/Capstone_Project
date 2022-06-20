@@ -1,8 +1,8 @@
 ---
 
-Significant PGA Tour Metrics for Playoff Events
+title: Significant PGA Tour Metrics for Playoff Events
 
-Andrew Raymond
+author: Andrew Raymond
 
 ---
 

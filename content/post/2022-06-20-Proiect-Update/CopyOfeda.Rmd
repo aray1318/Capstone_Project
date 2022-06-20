@@ -1,5 +1,5 @@
 ---
-title: "pga_tour"
+title: "EDA For PGA Tour Metrics for Playoff Events"
 author: "Andrew Raymond"
 date: "6/6/2022"
 output: html_document

@@ -1,6 +1,6 @@
 ---
 
-title: Significant PGA Tour Metrics for Playoff Events
+title: Intro to PGA Tour Metrics for Playoff Events
 
 author: Andrew Raymond
 

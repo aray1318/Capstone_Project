@@ -1,0 +1,261 @@
+---
+title: "pga_tour"
+author: "Andrew Raymond"
+date: "6/6/2022"
+output: html_document
+---
+
+
+
+<div id="loading-the-data" class="section level2">
+<h2>Loading the data</h2>
+<pre class="r"><code>library(tidyverse)</code></pre>
+<pre><code>## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ──</code></pre>
+<pre><code>## ✓ ggplot2 3.3.5     ✓ purrr   0.3.4
+## ✓ tibble  3.1.6     ✓ dplyr   1.0.8
+## ✓ tidyr   1.2.0     ✓ stringr 1.4.0
+## ✓ readr   2.0.1     ✓ forcats 0.5.1</code></pre>
+<pre><code>## Warning: package &#39;tidyr&#39; was built under R version 4.1.2</code></pre>
+<pre><code>## Warning: package &#39;dplyr&#39; was built under R version 4.1.2</code></pre>
+<pre><code>## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+## x dplyr::filter() masks stats::filter()
+## x dplyr::lag()    masks stats::lag()</code></pre>
+<pre class="r"><code>pga_data = read_csv(&quot;CopyOfpga_tour.csv&quot;)</code></pre>
+<pre><code>## Rows: 33188 Columns: 37</code></pre>
+<pre><code>## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr   (5): Player_initial_last, player, tournament name, course, Finish
+## dbl  (28): tournament id, player id, hole_par, strokes, hole_DKP, hole_FDP, ...
+## lgl   (3): Unnamed: 2, Unnamed: 3, Unnamed: 4
+## date  (1): date
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre class="r"><code>pga_data = pga_data %&gt;%
+  select(-`Unnamed: 2`, -`Unnamed: 3`, -`Unnamed: 4`)
+
+
+head(pga_data)</code></pre>
+<pre><code>## # A tibble: 6 × 34
+##   Player_initial_last `tournament id` `player id` hole_par strokes hole_DKP
+##   &lt;chr&gt;                         &lt;dbl&gt;       &lt;dbl&gt;    &lt;dbl&gt;   &lt;dbl&gt;    &lt;dbl&gt;
+## 1 A. Ancer                  401243402        9261      280     274     63  
+## 2 B. DeChambeau             401243402       10046      280     274     70.5
+## 3 B. Horschel               401243402        1651      280     270     72  
+## 4 B. Koepka                 401243402        6798      140     138     34.5
+## 5 C. Conners                401243402        9126      280     278     62.5
+## 6 C. Morikawa               401243402       10592      280     283     55.5
+## # … with 28 more variables: hole_FDP &lt;dbl&gt;, hole_SDP &lt;dbl&gt;, streak_DKP &lt;dbl&gt;,
+## #   streak_FDP &lt;dbl&gt;, streak_SDP &lt;dbl&gt;, n_rounds &lt;dbl&gt;, made_cut &lt;dbl&gt;,
+## #   pos &lt;dbl&gt;, finish_DKP &lt;dbl&gt;, finish_FDP &lt;dbl&gt;, finish_SDP &lt;dbl&gt;,
+## #   total_DKP &lt;dbl&gt;, total_FDP &lt;dbl&gt;, total_SDP &lt;dbl&gt;, player &lt;chr&gt;,
+## #   tournament name &lt;chr&gt;, course &lt;chr&gt;, date &lt;date&gt;, purse &lt;dbl&gt;,
+## #   season &lt;dbl&gt;, no_cut &lt;dbl&gt;, Finish &lt;chr&gt;, sg_putt &lt;dbl&gt;, sg_arg &lt;dbl&gt;,
+## #   sg_app &lt;dbl&gt;, sg_ott &lt;dbl&gt;, sg_t2g &lt;dbl&gt;, sg_total &lt;dbl&gt;</code></pre>
+</div>
+<div id="tour-championship-data" class="section level2">
+<h2>Tour Championship Data</h2>
+<p>Here I filtered out the tournament the “Tour Championship” from the main data frame. Then I only selected the winners so I could gain some insight about what their average metrics. The metrics that were the most important for winning the tournament were strokes gained total, strokes gained tee to green, and strokes gained off the tee.</p>
+<pre class="r"><code>tour_championship &lt;- pga_data[pga_data$`tournament name` == &quot;Tour Championship&quot;,]
+#view(tour_championship)
+
+tour_championship =tour_championship %&gt;% 
+  group_by(season) %&gt;% 
+  slice(which.min(pos))%&gt;%
+  select(-hole_DKP, - hole_FDP, - hole_SDP, -streak_DKP, -streak_FDP, - streak_SDP, -finish_DKP, - finish_SDP, -total_DKP, -total_FDP, -total_SDP, -finish_FDP, -total_FDP)
+
+drop_na(tour_championship[,17:22])%&gt;%
+  summarise_all(function(x)mean(x))</code></pre>
+<pre><code>## # A tibble: 1 × 6
+##   sg_putt sg_arg sg_app sg_ott sg_t2g sg_total
+##     &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;    &lt;dbl&gt;
+## 1   0.539  0.504  0.343  0.947   1.80     2.34</code></pre>
+</div>
+<div id="bmw-championship-data" class="section level2">
+<h2>BMW Championship Data</h2>
+<p>Here I filtered out the tournament the “BMW Championship” from the main data frame. Then I only selected the winners so I could gain some insight about what their average metrics. The metrics that were the most important for winning the tournament were strokes gained total, strokes gained tee to green, and strokes gained putting.</p>
+<pre class="r"><code>bmw_championship &lt;- pga_data[pga_data$`tournament name` == &quot;BMW Championship&quot;,]
+#head(bmw_championship)
+bmw_championship = bmw_championship %&gt;%
+  group_by(season) %&gt;% 
+  slice(which.min(pos)) %&gt;%
+  select(-hole_DKP, - hole_FDP, - hole_SDP, -streak_DKP, -streak_FDP, - streak_SDP, -finish_DKP, - finish_SDP, -total_DKP, -total_FDP, -total_SDP, -finish_FDP, -total_FDP)
+
+drop_na(bmw_championship[,17:22])%&gt;%
+  summarise_all(function(x)mean(x))</code></pre>
+<pre><code>## # A tibble: 1 × 6
+##   sg_putt sg_arg sg_app sg_ott sg_t2g sg_total
+##     &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;    &lt;dbl&gt;
+## 1    1.76  0.325  0.963  0.685   1.97     3.73</code></pre>
+</div>
+<div id="northern-trust-data" class="section level2">
+<h2>Northern Trust Data</h2>
+<p>Here I filtered out the tournament the “Northern Trust” from the main data frame. Then I only selected the winners so I could gain some insight about what their average metrics. The metrics that were the most important for winning the tournament were strokes gained total, strokes gained tee to green, and strokes gained approach.</p>
+<pre class="r"><code>north_trust &lt;- pga_data[pga_data$`tournament name` %in% c(&quot;Northern Trust Open&quot;, &quot;The Northern Trust&quot;),]
+drop_na(north_trust) </code></pre>
+<pre><code>## # A tibble: 478 × 34
+##    Player_initial_last `tournament id` `player id` hole_par strokes hole_DKP
+##    &lt;chr&gt;                         &lt;dbl&gt;       &lt;dbl&gt;    &lt;dbl&gt;   &lt;dbl&gt;    &lt;dbl&gt;
+##  1 A. Ancer                  401243404        9261      284     280     74  
+##  2 A. Lahiri                 401243404        4989      284     279     68.5
+##  3 A. Noren                  401243404        3832      284     269     85.5
+##  4 A. Putnam                 401243404        5502      284     279     68.5
+##  5 A. Schenk                 401243404       10372      284     276     72  
+##  6 A. Wise                   401243404       10577      284     274     79.5
+##  7 B. DeChambeau             401243404       10046      284     276     88  
+##  8 B. Harman                 401243404        1225      284     287     59.5
+##  9 B. Horschel               401243404        1651      284     276     77  
+## 10 B. Koepka                 401243404        6798      284     276     76  
+## # … with 468 more rows, and 28 more variables: hole_FDP &lt;dbl&gt;, hole_SDP &lt;dbl&gt;,
+## #   streak_DKP &lt;dbl&gt;, streak_FDP &lt;dbl&gt;, streak_SDP &lt;dbl&gt;, n_rounds &lt;dbl&gt;,
+## #   made_cut &lt;dbl&gt;, pos &lt;dbl&gt;, finish_DKP &lt;dbl&gt;, finish_FDP &lt;dbl&gt;,
+## #   finish_SDP &lt;dbl&gt;, total_DKP &lt;dbl&gt;, total_FDP &lt;dbl&gt;, total_SDP &lt;dbl&gt;,
+## #   player &lt;chr&gt;, tournament name &lt;chr&gt;, course &lt;chr&gt;, date &lt;date&gt;,
+## #   purse &lt;dbl&gt;, season &lt;dbl&gt;, no_cut &lt;dbl&gt;, Finish &lt;chr&gt;, sg_putt &lt;dbl&gt;,
+## #   sg_arg &lt;dbl&gt;, sg_app &lt;dbl&gt;, sg_ott &lt;dbl&gt;, sg_t2g &lt;dbl&gt;, sg_total &lt;dbl&gt;</code></pre>
+<pre class="r"><code>#view(north_trust)
+north_trust = north_trust%&gt;% 
+  group_by(season) %&gt;% 
+  slice(which.min(Finish)) %&gt;% 
+  filter(season &gt; 2016)%&gt;%
+  select(-hole_DKP, - hole_FDP, - hole_SDP, -streak_DKP, -streak_FDP, - streak_SDP, -finish_DKP, - finish_SDP, -total_DKP, -total_FDP, -total_SDP, -finish_FDP, -total_FDP)</code></pre>
+<pre><code>## Warning in which.min(Finish): NAs introduced by coercion
+
+## Warning in which.min(Finish): NAs introduced by coercion
+
+## Warning in which.min(Finish): NAs introduced by coercion
+
+## Warning in which.min(Finish): NAs introduced by coercion
+
+## Warning in which.min(Finish): NAs introduced by coercion
+
+## Warning in which.min(Finish): NAs introduced by coercion
+
+## Warning in which.min(Finish): NAs introduced by coercion</code></pre>
+<pre class="r"><code>drop_na(north_trust[,17:22])%&gt;%
+  summarise_all(function(x)mean(x))</code></pre>
+<pre><code>## # A tibble: 1 × 6
+##   sg_putt sg_arg sg_app sg_ott sg_t2g sg_total
+##     &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;    &lt;dbl&gt;
+## 1    1.11  0.434   1.56   1.11   3.10     4.21</code></pre>
+</div>
+<div id="additional-data-for-results-by-season" class="section level2">
+<h2>Additional Data for Results by Season</h2>
+<pre class="r"><code>pga2 = read_csv(&quot;./CopyOfpgaTourData2.csv&quot;)</code></pre>
+<pre><code>## Rows: 2312 Columns: 18
+## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr  (2): Player Name, Money
+## dbl (15): Rounds, Fairway Percentage, Year, Avg Distance, gir, Average Putts...
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre class="r"><code>head(pga2)</code></pre>
+<pre><code>## # A tibble: 6 × 18
+##   `Player Name`  Rounds `Fairway Percentage`  Year `Avg Distance`   gir
+##   &lt;chr&gt;           &lt;dbl&gt;                &lt;dbl&gt; &lt;dbl&gt;          &lt;dbl&gt; &lt;dbl&gt;
+## 1 Henrik Stenson     60                 75.2  2018           292.  73.5
+## 2 Ryan Armour       109                 73.6  2018           284.  68.2
+## 3 Chez Reavie        93                 72.2  2018           286.  68.7
+## 4 Ryan Moore         78                 71.9  2018           289.  68.8
+## 5 Brian Stuard      103                 71.4  2018           279.  67.1
+## 6 Brian Gay         103                 71.4  2018           283.  64.5
+## # … with 12 more variables: Average Putts &lt;dbl&gt;, Average Scrambling &lt;dbl&gt;,
+## #   Average Score &lt;dbl&gt;, Points &lt;dbl&gt;, Wins &lt;dbl&gt;, Top 10 &lt;dbl&gt;,
+## #   Average SG Putts &lt;dbl&gt;, Average SG Total &lt;dbl&gt;, SG:OTT &lt;dbl&gt;, SG:APR &lt;dbl&gt;,
+## #   SG:ARG &lt;dbl&gt;, Money &lt;chr&gt;</code></pre>
+<pre class="r"><code>#looking at distubution of data by year
+ggplot(data = pga2, aes (x= Year))+
+  geom_bar()</code></pre>
+<p><img src="/post/2022-06-20-proiect-update/CopyOfeda_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+</div>
+<div id="players-with-most-fedex-points-by-season" class="section level2">
+<h2>Player’s With Most Fedex Points by Season</h2>
+<p>I filtered out players who had the most Fedex Cup points in the data frame for each year. The metrics that were rated the highest for season long success were strokes gained total, strokes gained approach.</p>
+<pre class="r"><code>library(dplyr)
+
+pga2 %&gt;% 
+  group_by(Year) %&gt;% 
+  slice(which.max(Points))</code></pre>
+<pre><code>## # A tibble: 9 × 18
+## # Groups:   Year [9]
+##   `Player Name`    Rounds `Fairway Percentage`  Year `Avg Distance`   gir
+##   &lt;chr&gt;             &lt;dbl&gt;                &lt;dbl&gt; &lt;dbl&gt;          &lt;dbl&gt; &lt;dbl&gt;
+## 1 Ernie Els            72                 60.2  2010           288.  67.9
+## 2 Nick Watney          80                 58.2  2011           302.  66.9
+## 3 Tiger Woods          69                 63.9  2012           297.  67.6
+## 4 Tiger Woods          61                 62.5  2013           293.  67.6
+## 5 Rory McIlroy         66                 59.9  2014           310.  69.4
+## 6 Jordan Spieth        91                 62.9  2015           292.  67.9
+## 7 Jason Day            76                 50.5  2016           304.  67.2
+## 8 Hideki Matsuyama     83                 57.6  2017           303.  69.1
+## 9 Dustin Johnson       77                 59.5  2018           314   70.6
+## # … with 12 more variables: Average Putts &lt;dbl&gt;, Average Scrambling &lt;dbl&gt;,
+## #   Average Score &lt;dbl&gt;, Points &lt;dbl&gt;, Wins &lt;dbl&gt;, Top 10 &lt;dbl&gt;,
+## #   Average SG Putts &lt;dbl&gt;, Average SG Total &lt;dbl&gt;, SG:OTT &lt;dbl&gt;, SG:APR &lt;dbl&gt;,
+## #   SG:ARG &lt;dbl&gt;, Money &lt;chr&gt;</code></pre>
+<p>##Variable importance for predicting if a player wins in a given season</p>
+<p>Here I created a basic model for determining if a player will win a tournament in a given season. The most significant indicators that were correlated with winning were points (which is fairly obvious because points are determined by how well you place in a tournament). Average score and number of top tens were also highly correlated (top tens essentially mean that a player has put themselves in more opportunities to win). Then lastly we had strokes gained total, strokes gained off the tee and scrambling (amount of times a player makes par or better when missing the fairway/green).</p>
+<pre class="r"><code>library(caret)</code></pre>
+<pre><code>## Warning: package &#39;caret&#39; was built under R version 4.1.2</code></pre>
+<pre><code>## Loading required package: lattice</code></pre>
+<pre><code>## 
+## Attaching package: &#39;caret&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:purrr&#39;:
+## 
+##     lift</code></pre>
+<pre class="r"><code>pga3 = pga2
+
+pga3$Wins = ifelse(is.na(pga3$Wins),0,1)
+
+#head(pga3)
+
+pga3 = drop_na(pga3)
+
+colnames(pga3) &lt;- make.names(colnames(pga3))
+
+set.seed(504)
+
+pga3$Wins = as.factor(pga3$Wins)
+
+rPartMod &lt;- train(Wins ~ ., data=pga3, method=&quot;rpart&quot;)
+
+rpartImp &lt;- varImp(rPartMod)
+
+print(rpartImp)</code></pre>
+<pre><code>## rpart variable importance
+## 
+##   only 20 most important variables shown (out of 1732)
+## 
+##                              Overall
+## Points                       100.000
+## Average.Score                 36.549
+## Top.10                        34.837
+## Average.SG.Total              33.655
+## SG.OTT                         9.624
+## gir                            8.627
+## Average.Scrambling             7.898
+## `Player.NameJon Rahm`          0.000
+## `Money1,158,485`               0.000
+## `Money1,521,663`               0.000
+## `Money$6,133,158`              0.000
+## `Money$1,380,579`              0.000
+## `Player.NameBilly Horschel`    0.000
+## `Money$1,638,419`              0.000
+## `Money2,489,402`               0.000
+## `Player.NameBrandt Snedeker`   0.000
+## `Money$1,004,161`              0.000
+## `Money$1,525,774`              0.000
+## `Money1,035,688`               0.000
+## `Money$1,342,198`              0.000</code></pre>
+</div>
+<div id="distribution-of-number-of-players-with-and-without-wins" class="section level2">
+<h2>Distribution of Number of Players With and Without Wins</h2>
+<p>This chart shows the distribution of the number of players who did not win a tournament (0) and did win (1) by season. The main takeaway from this was that the seasons 2010, 2017, and 2018 had the least amount of variance. Meaning in this context that a smaller amount of players won and these players are more likely to win multiple times in these seasons.</p>
+<pre class="r"><code>ggplot(data = pga3, aes (x= Wins))+
+  geom_bar()+
+  facet_wrap(~Year)+
+  coord_flip()+
+  ggtitle(&quot;Distribution of players that had 0 or 1+ wins on the PGA Tour by year&quot;)</code></pre>
+<p><img src="/post/2022-06-20-proiect-update/CopyOfeda_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+</div>

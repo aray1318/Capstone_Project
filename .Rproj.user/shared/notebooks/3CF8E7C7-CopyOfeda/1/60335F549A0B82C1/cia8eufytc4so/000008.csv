@@ -1,22 +1,5 @@
 "0","library(caret)"
-"2","Warning:"
-"2"," package ‘caret’ was built under R version 4.1.2
-"
-"2","Loading required package: lattice
-"
-"2","Registered S3 method overwritten by 'data.table':
-  method           from
-  print.data.table     
-"
-"2","
-Attaching package: ‘caret’
-
-"
-"2","The following object is masked from ‘package:purrr’:
-
-    lift
-
-"
+"0",""
 "0","pga3 = pga2"
 "0",""
 "0","pga3$Wins = ifelse(is.na(pga3$Wins),0,1)"

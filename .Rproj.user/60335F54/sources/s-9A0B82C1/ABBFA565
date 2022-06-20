@@ -3,7 +3,7 @@
     "path": "~/Capstone_Raymond/content/post/2022-06-20-Proiect-Update/CopyOfeda.Rmd",
     "project_path": "content/post/2022-06-20-Proiect-Update/CopyOfeda.Rmd",
     "type": "r_markdown",
-    "hash": "0",
+    "hash": "3563691020",
     "contents": "",
     "dirty": true,
     "created": 1655751816397.0,
@@ -12,15 +12,15 @@
     "properties": {
         "source_window_id": "",
         "Source": "Source",
-        "cursorPosition": "129,136",
-        "scrollLine": "117"
+        "cursorPosition": "106,0",
+        "scrollLine": "98"
     },
     "folds": "",
     "lastKnownWriteTime": 1655750451,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1655753943531,
+    "last_content_update": 1655754256914,
     "read_only": false,
     "read_only_alternatives": []
 }

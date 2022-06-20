@@ -103,6 +103,8 @@ pga2 %>%
 Here I created a basic model for determining if a player will win a tournament in a given season. The most significant indicators that were correlated with winning were points (which is fairly obvious because points are determined by how well you place in a tournament). Average score and number of top tens were also highly correlated (top tens essentially mean that a player has put themselves in more opportunities to win). Then lastly we had strokes gained total, strokes gained off the tee and scrambling (amount of times a player makes par or better when missing the fairway/green).
 
 ```{r}
+library(caret)
+
 pga3 = pga2
 
 pga3$Wins = ifelse(is.na(pga3$Wins),0,1)

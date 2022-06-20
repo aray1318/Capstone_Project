@@ -9,7 +9,7 @@ output: html_document
 
 ```{r}
 library(tidyverse)
-pga_data = read_csv("/Users/aray1318/desktop/pga_tour.csv")
+pga_data = read_csv("./CopyOfpga_tour.csv")
 
 
 pga_data = pga_data %>%
@@ -75,7 +75,7 @@ drop_na(north_trust[,17:22])%>%
 ## Additional Data for Results by Season
 
 ```{r}
-pga2 = read_csv("/Users/aray1318/desktop/pgaTourData2.csv")
+pga2 = read_csv("./CopyOfpgaTourData2.csv")
 head(pga2)
 
 #looking at distubution of data by year

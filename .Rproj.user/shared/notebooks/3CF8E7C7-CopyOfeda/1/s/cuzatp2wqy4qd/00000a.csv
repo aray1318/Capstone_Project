@@ -1,2 +1,0 @@
-"0","north_trust <- pga_data[pga_data$`tournament name` %in% c(""Northern Trust Open"", ""The Northern Trust""),]"
-"0","drop_na(north_trust) "

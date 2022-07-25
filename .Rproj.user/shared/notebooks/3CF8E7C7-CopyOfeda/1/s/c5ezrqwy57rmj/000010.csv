@@ -1,5 +1,0 @@
-"0",""
-"0","#looking at distubution of data by year"
-"0","ggplot(data = pga2, aes (x= Year))+"
-"0","  geom_bar()"
-"0",""

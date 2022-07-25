@@ -16,7 +16,7 @@ pga_data = pga_data %>%
   select(-`Unnamed: 2`, -`Unnamed: 3`, -`Unnamed: 4`)
 
 
-head(pga_data)
+pga_data
 ```
 
 ## Tour Championship Data 
@@ -25,7 +25,7 @@ Here I filtered out the tournament the "Tour Championship" from the main data fr
 
 ```{r}
 tour_championship <- pga_data[pga_data$`tournament name` == "Tour Championship",]
-#view(tour_championship)
+view(tour_championship)
 
 tour_championship =tour_championship %>% 
   group_by(season) %>% 
@@ -43,7 +43,8 @@ Here I filtered out the tournament the "BMW Championship" from the main data fra
 
 ```{r}
 bmw_championship <- pga_data[pga_data$`tournament name` == "BMW Championship",]
-#head(bmw_championship)
+
+
 bmw_championship = bmw_championship %>%
   group_by(season) %>% 
   slice(which.min(pos)) %>%
@@ -51,6 +52,92 @@ bmw_championship = bmw_championship %>%
 
 drop_na(bmw_championship[,17:22])%>%
   summarise_all(function(x)mean(x))
+
+bmw_championship[7]
+```
+Logistic Regression for BMW
+
+```{r}
+bmw <- pga_data[pga_data$`tournament name` == "BMW Championship",]
+head(bmw_championship)
+
+bmw[bmw$player == "Bryson DeChambeau",]
+
+bmw_model = bmw %>%
+  select(-Player_initial_last, -`tournament id`, - `player id`, - hole_par, -strokes, -n_rounds, -player, -`tournament name`, -course, -date, -purse, -no_cut, -Finish, -hole_DKP, -hole_FDP, -hole_SDP, -streak_DKP, -streak_FDP, -streak_SDP, -finish_DKP, -finish_FDP, -finish_SDP, -season, -total_DKP, -total_FDP, -total_SDP)
+na.omit(bmw_model)
+
+bmw_model$Top_25 <- as.numeric(bmw_model$pos >= 25)
+bmw_model$Top_10 <- as.numeric(bmw_model$pos >= 10)
+
+bmw_model = bmw_model%>%
+  select(-made_cut, -pos, -sg_total)
+bmw_model
+
+```
+Model for Top 25
+
+```{r}
+library(caret)
+library(naivebayes)
+
+bmw_model1 = na.omit(bmw_model)%>%
+  select(-Top_10)
+
+set.seed(504)
+bmw_index <- createDataPartition(bmw_model1$Top_25, p = 0.8, list = FALSE)
+train <- bmw_model1[ bmw_index, ]
+test <- bmw_model1[-bmw_index, ]
+table(train$Top_25)
+
+
+control <- trainControl(method = "cv", number = 5)
+fit <- train(Top_25 ~ .,
+             data = train, 
+             trControl = control,
+             method = "glm",
+             family = "binomial")
+
+prob <- predict(fit, newdata=test)
+
+pred <- ifelse(prob > 0.5, 1, 0)
+
+confusionMatrix(factor(pred),factor(test$Top_25))
+
+
+plot(varImp(fit, scale= TRUE))
+
+
+```
+Model for Top 10
+
+```{r}
+bmw_model2 = na.omit(bmw_model)%>%
+  select(-Top_25)
+
+set.seed(504)
+bmw_index <- createDataPartition(bmw_model2$Top_10, p = 0.8, list = FALSE)
+train <- bmw_model2[ bmw_index, ]
+test <- bmw_model2[-bmw_index, ]
+table(train$Top_10)
+
+
+control <- trainControl(method = "cv", number = 5)
+fit <- train(Top_10 ~ .,
+             data = train, 
+             trControl = control,
+             method = "glm",
+             family = "binomial")
+
+prob <- predict(fit, newdata=test)
+
+pred <- ifelse(prob > 0.5, 1, 0)
+
+confusionMatrix(factor(pred),factor(test$Top_10))
+
+
+plot(varImp(fit, scale= TRUE))
+
 
 ```
 
@@ -71,6 +158,90 @@ north_trust = north_trust%>%
 drop_na(north_trust[,17:22])%>%
   summarise_all(function(x)mean(x))
 ```
+
+North Trust Logistic Regression Model
+
+```{r}
+north <- pga_data[pga_data$`tournament name` %in% c("Northern Trust Open", "The Northern Trust"),]
+
+north_model = north %>%
+  select(-Player_initial_last, -`tournament id`, - `player id`, - hole_par, -strokes, -n_rounds, -player, -`tournament name`, -course, -date, -purse, -no_cut, -Finish, -hole_DKP, -hole_FDP, -hole_SDP, -streak_DKP, -streak_FDP, -streak_SDP, -finish_DKP, -finish_FDP, -finish_SDP, -season, -total_DKP, -total_FDP, -total_SDP)
+north_model = na.omit(north_model)
+north_model
+
+north_model$Top_25 <- as.numeric(north_model$pos >= 25)
+north_model$Top_10 <- as.numeric(north_model$pos >= 10)
+
+north_model = north_model%>%
+  select(-made_cut, -pos)
+north_model
+```
+
+Top 25
+
+```{r}
+north_model1 = na.omit(north_model)%>%
+  select(-Top_10, -sg_total)
+
+set.seed(504)
+north_index <- createDataPartition(north_model1$Top_25, p = 0.5, list = FALSE)
+train <- north_model1[ north_index, ]
+test <- north_model1[-north_index, ]
+table(train$Top_25)
+
+
+control <- trainControl(method = "cv", number = 5)
+fit <- train(Top_25 ~ .,
+             data = train, 
+             trControl = control,
+             method = "glm",
+             family = "binomial")
+
+prob <- predict(fit, newdata=test)
+
+pred <- ifelse(prob > 0.5, 1, 0)
+
+confusionMatrix(factor(pred),factor(test$Top_25))
+
+
+plot(varImp(fit, scale= TRUE))
+
+```
+
+Top 10
+
+```{r}
+north_model2 = na.omit(north_model)%>%
+  select(-Top_25,- sg_total)
+
+set.seed(504)
+north_index <- createDataPartition(north_model2$Top_10, p = 0.5, list = FALSE)
+train <- north_model2[ north_index, ]
+test <- north_model2[-north_index, ]
+table(train$Top_10)
+
+
+control <- trainControl(method = "cv", number = 5)
+fit <- train(Top_10 ~ .,
+             data = train, 
+             trControl = control,
+             method = "glm",
+             family = "binomial")
+
+prob <- predict(fit, newdata=test)
+
+pred <- ifelse(prob > 0.5, 1, 0)
+
+confusionMatrix(factor(pred),factor(test$Top_10))
+
+
+plot(varImp(fit, scale= TRUE))
+
+table(train$Top_10)
+
+
+```
+
 
 ## Additional Data for Results by Season
 
@@ -106,12 +277,13 @@ Here I created a basic model for determining if a player will win a tournament i
 library(caret)
 
 pga3 = pga2
-
+pga3
 pga3$Wins = ifelse(is.na(pga3$Wins),0,1)
 
 #head(pga3)
 
 pga3 = drop_na(pga3)
+```
 
 colnames(pga3) <- make.names(colnames(pga3))
 
@@ -125,7 +297,7 @@ rpartImp <- varImp(rPartMod)
 
 print(rpartImp)
 
-```
+
 
 ## Distribution of Number of Players With and Without Wins
 
@@ -139,3 +311,258 @@ ggplot(data = pga3, aes (x= Wins))+
   ggtitle("Distribution of players that had 0 or 1+ wins on the PGA Tour by year")
 
 ```
+-add interactions in models
+-merge data frames on player name
+-sg putting and winnings
+-interactions between driving and putting
+
+
+
+
+```{r}
+
+pga3 = pga3 %>% 
+  rename(player = `Player Name`)
+head(pga3)
+
+bmw = bmw %>% 
+  rename(Year = season)
+
+head(bmw)
+
+library(dplyr)
+BMW_Final = merge(bmw, pga3, by= c("player", "Year"))
+
+BMW_Final[BMW_Final$player == "Bryson DeChambeau", ]
+
+BMW_Final = BMW_Final%>%
+  select(-Player_initial_last, -`tournament id`, - `player id`, - hole_par, -strokes, -n_rounds, -`tournament name`, -course, -date, -purse, -no_cut, -Finish, -hole_DKP, -hole_FDP, -hole_SDP, -streak_DKP, -streak_FDP, -streak_SDP, -finish_DKP, -finish_FDP, -finish_SDP, -total_DKP, -total_FDP, -total_SDP)
+
+BMW_Final = BMW_Final%>%
+  select(-made_cut, sg_putt, -sg_arg, -sg_app, -sg_ott, -sg_t2g, -sg_total, -Rounds, -Points, -Wins, -`Top 10`, -Money)
+
+BMW_Final$Top_25 <- as.numeric(BMW_Final$pos >= 25)
+BMW_Final$Top_10 <- as.numeric(BMW_Final$pos >= 10)
+
+#BMW_Final = BMW_Final%>%
+ # select(-pos)
+
+BMW_Final = na.omit(BMW_Final)
+
+
+```
+
+
+```{r}
+BMW_Final_25 = na.omit(BMW_Final)%>%
+  select(-Top_10, -player, -Year, -gir, -pos)
+
+head(BMW_Final_25)
+
+BMW_Final_25 = na.omit(BMW_Final)%>%
+  select(-sg_putt, -player, -pos, -Top_10, -Year)
+  
+
+head(BMW_Final_25)
+
+set.seed(504)
+BMW_F25_index <- createDataPartition(BMW_Final_25$Top_25, p = 0.5, list = FALSE)
+train <- BMW_Final_25[ BMW_F25_index, ]
+test <- BMW_Final_25[-BMW_F25_index, ]
+
+table(train$Top_25)
+
+
+control <- trainControl(method = "cv", number = 5)
+fit <- train(Top_25 ~ .,
+             data = train, 
+             trControl = control,
+             method = "glm",
+             family = "binomial")
+
+prob <- predict(fit, newdata=test)
+
+pred <- ifelse(prob > 0.5, 1, 0)
+
+confusionMatrix(factor(pred),factor(test$Top_25))
+
+
+plot(varImp(fit, scale= TRUE))
+
+```
+
+top 10 bmw
+
+```{r}
+head(BMW_Final)
+
+BMW_Final_10 = na.omit(BMW_Final)%>%
+  select(-Top_25, -player, -Year, -gir, -pos)
+
+head(BMW_Final_10)
+
+#BMW_Final_10 = na.omit(BMW_Final)
+  
+BMW_Final_10 = BMW_Final_10%>%
+  select(-`Average SG Total`, -sg_putt)
+
+head(BMW_Final_10)
+```
+
+
+```{r}
+set.seed(504)
+
+head(BMW_Final_10)
+
+BMW_F10_index <- createDataPartition(BMW_Final_10$Top_10, p = 0.5, list = FALSE)
+train <- BMW_Final_10[ BMW_F10_index, ]
+test <- BMW_Final_10[-BMW_F10_index, ]
+
+table(train$Top_10)
+
+
+control <- trainControl(method = "cv", number = 5)
+fit <- train(Top_10 ~ .,
+             data = train, 
+             trControl = control,
+             method = "glm",
+             family = "binomial")
+
+prob <- predict(fit, newdata=test)
+
+pred <- ifelse(prob > 0.5, 1, 0)
+
+confusionMatrix(factor(pred),factor(test$Top_10))
+
+
+plot(varImp(fit, scale= TRUE))
+
+
+```
+North trust
+
+```{r}
+
+head(north)
+
+north_model_F = north %>%
+  select(-Player_initial_last, -`tournament id`, - `player id`, - hole_par, -strokes, -n_rounds, -`tournament name`, -course, -date, -purse, -no_cut, -Finish, -hole_DKP, -hole_FDP, -hole_SDP, -streak_DKP, -streak_FDP, -streak_SDP, -finish_DKP, -finish_FDP, -finish_SDP, -total_DKP, -total_FDP, -total_SDP)
+
+#north_model_F = na.omit(north_model_F)
+
+head(north_model_F)
+
+north_model_F$Top_25 <- as.numeric(north_model_F$pos >= 25)
+north_model_F$Top_10 <- as.numeric(north_model_F$pos >= 10)
+
+north_model_F = north_model_F%>%
+  select(-made_cut, -pos, -sg_putt, -sg_arg, -sg_app, -sg_ott, -sg_t2g, -sg_total)
+
+head(north_model_F)
+
+na.omit(north_model_F)
+
+north_model_F= north_model_F%>%
+  rename(Year = season)
+
+head(north_model_F)
+
+```
+
+
+
+```{r}
+
+North_Final = merge(north_model_F, pga3, by= c("player", "Year"))
+
+North_Final[North_Final$player == "Bryson DeChambeau", ]
+
+North_Final = na.omit(North_Final)
+
+North_Final = North_Final%>%
+  select(-Money, -`Top 10`, -Wins, -Points, -Year, -player)
+
+
+```
+ 
+North 25
+
+```{r}
+North_F25 = North_Final%>%
+  select(-Top_10)
+
+set.seed(504)
+
+North_F25_index <- createDataPartition(North_F25$Top_25, p = 0.5, list = FALSE)
+train <- North_F25[ North_F25_index, ]
+test <- North_F25[-North_F25_index, ]
+
+table(train$Top_25)
+
+
+control <- trainControl(method = "cv", number = 5)
+fit <- train(Top_25 ~ .,
+             data = train, 
+             trControl = control,
+             method = "glm",
+             family = "binomial")
+
+prob <- predict(fit, newdata=test)
+
+pred <- ifelse(prob > 0.5, 1, 0)
+
+confusionMatrix(factor(pred),factor(test$Top_25))
+
+
+plot(varImp(fit, scale= TRUE))
+
+
+```
+
+
+North Top 10
+
+```{r}
+
+North_F10 = North_Final%>%
+  select(-Top_25)
+
+set.seed(504)
+
+North_F10_index <- createDataPartition(North_F10$Top_10, p = 0.2, list = FALSE)
+train <- North_F10[ North_F10_index, ]
+test <- North_F10[-North_F10_index, ]
+
+table(train$Top_10)
+
+
+control <- trainControl(method = "cv", number = 5)
+fit <- train(Top_10 ~ .,
+             data = train, 
+             trControl = control,
+             method = "glm",
+             family = "binomial")
+
+prob <- predict(fit, newdata=test)
+
+pred <- ifelse(prob > 0.5, 1, 0)
+
+confusionMatrix(factor(pred),factor(test$Top_10))
+
+
+plot(varImp(fit, scale= TRUE))
+
+
+
+```
+
+
+-random forest models
+
+-graph is top x finish and y axis is accuracy
+
+-graph how predictive power decreases as finishes get better
+
+-case study for best players for a given tournament 
+

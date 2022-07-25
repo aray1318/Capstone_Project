@@ -1,0 +1,341 @@
+---
+
+Drive for Show, Putt for Dough?
+
+Andrew Raymond
+
+---
+
+## Introduction
+
+The sport of golf and specifically the PGA Tour and its players undervalue data surrounding player metrics. Other sports use metrics to give players a competitive advantage in certain situations, golf needs to do the same. My goal was to find out which metrics play the most significant role in two of the PGA's playoff tournaments, The BMW Championship and the Northern Trust. These insights can be used whether you are a coach, player, fan, or even a sports bettor.
+
+## Background 
+
+The metrics used on the PGA Tour are incredibly in depth and powerful yet, they are undoubtedly not used to their fullest potential. Many of the articles on the internet and statistics shown on broadcasts inform the audience on general trends and overall metrics for players. However, shouldn't the players and audience know what metrics are best suited for specific tournaments on tour. The PGA Tour is very exploratory by simply looking at season long trends, this only tells part of the story. Certain tournaments and courses are undoubtedly tailored to specific play styles. All players should know what metrics are most important for a given tournament in order for them to prepare their game to the best of their ability.
+
+Some high tier players may already have access to this sort of information solely due to their name and or resources. However, younger or newer players on tour do not. They are fighting just to retain status for the coming year. Players regardless of status deserve equal access to course insides and information regarding which metrics are most important for not only the playoff events but for the other forty-five tournaments each year.
+
+ Another aspect is the viewer. The viewer should have access to the information as well because it makes the avid golf fan more invested and interested in a golf tournament. By making the information public it allows equal access to players and can grow the game and take it to a place it never has before. As it currently stands the PGA Tour has severe restrictions on its data, making it inaccessible to the public. By making the data public it can encourage an entire new crowd to grow the game. Much of professional sports and its excitement in the United States is driven by gambling. Golf comparatively to the other major sports is nowhere near as popular.
+
+## Definition of Metrics
+
+In this article I will discuss some of the metrics used to measure a player’s performance. Here is a list with definitions of the metrics that may come up.
+
+Rounds: Number of competitive tournament rounds played in a year
+Fairway Percentage: Percentage of times your tee shot lands in the fairway (the closely mown area that runs between the tee box and putting green of a golf hole)
+Average Distance: The average distance in yards a player’s tee shot travels
+GIR: Percent in which a player gets the ball reaching the putting surface in two or more strokes less than par, regardless of how it gets there. (Ex: 2 shots or less on a Par 4, 3 shots or less on a Par 5, and 1 shot on a Par 3
+Average Putts: Average number of putts a player has per round
+Average Scrambling: The percent a player makes par or better after missing the green in regulation (GIR explained above)
+Average Score: The average number of strokes per round
+Average SG Putt: Measures how many strokes a player gains (or loses) on the greens compared to the field of players
+SG OTT: Measures how many strokes a player gains (or loses) off the tee compared to the field of players (on all par 4 and 5’s)
+SG APR: Strokes gained: approach-the-green measures player performance on approach shots. Approach shots include all shots that are not from the tee on par-4 and par-5 holes and are not included in strokes gained: around-the-green and strokes gained: putting. Approach shots include tee shots on par-3s.
+SG ARG: Measures player performance on any shot within 30 yards of the edge of the green. This statistic does not include any shots taken on the putting green.
+
+## Models
+
+I created four final models, two for each tournament I was investigating (BMW Championship & Northern Trust). For each tournament I used the features defined above to predict top 25 and top 10 placements for each tournament. 
+
+Top 25 for Northern Trust Results:
+
+```{r, include=FALSE}
+library(caret)
+library(tidyverse)
+
+North2 = read_csv('./North2.csv')
+
+BMW2 = read_csv('./BMW2.csv')
+
+
+North25 = North2%>%
+  select(-Top_10)
+
+North25 = North25%>%
+  select(-`Average SG Total`)
+
+set.seed(504) 
+
+ctrl <- trainControl(method = "cv", number = 5)
+
+
+index <- createDataPartition(North25$Top_25, p = 0.70, list = FALSE)
+train <- North25[ index, ]
+test <- North25[-index, ]
+
+# set method to random forest
+fit <- train(Top_25 ~ .,
+             data = train, 
+             trControl = ctrl,
+             method = "rf", 
+             metric = "Kappa",  
+             tuneLength = 5, 
+             ntree = 500,
+             verbose = TRUE)
+
+fit
+
+
+pred <- predict(fit, newdata=test)
+
+confusionMatrix(as.factor(pred),factor(test$Top_25))
+
+
+print(fit$bestTune)
+
+
+```
+
+```{r, echo=FALSE}
+index1 <- createDataPartition(North25$Top_25, p = 0.70, list = FALSE)
+train1 <- North25[ index1, ]
+test1 <- North25[-index1, ]
+
+
+fit_final <- train(Top_25 ~ .,
+             data = train1, 
+             method = "rf", 
+             ntree = 500,
+             verbose = TRUE,
+             tuneGrid = fit$bestTune,
+             min_n = 5)
+
+#fit_final
+
+confusionMatrix(predict(fit_final, test1),factor(test1$Top_25))
+
+plot(varImp(fit, scale= TRUE))
+```
+
+Top 10 for Northern Trust Results:
+
+```{r, include=FALSE}
+North10 = North2%>%
+  select(-Top_25)
+
+North10 = North10%>%
+  select(-`Average SG Total`)
+
+set.seed(504) 
+
+ctrl <- trainControl(method = "cv", number = 5)
+
+
+index <- createDataPartition(North10$Top_10, p = 0.80, list = FALSE)
+train <- North10[ index, ]
+test <- North10[-index, ]
+
+# set method to random forest
+fit <- train(Top_10 ~ .,
+             data = train, 
+             trControl = ctrl,
+             method = "rf", 
+             metric = "Kappa",  
+             tuneLength = 5, 
+             ntree = 500,
+             verbose = TRUE)
+
+fit
+
+
+pred <- predict(fit, newdata=test)
+
+confusionMatrix(as.factor(pred),factor(test$Top_10))
+
+
+print(fit$bestTune)
+
+```
+
+```{r, echo=FALSE}
+set.seed(504) 
+
+index1 <- createDataPartition(North10$Top_10, p = 0.50, list = FALSE)
+train1 <- North10[ index1, ]
+test1 <- North10[-index1, ]
+
+
+fit_final <- train(Top_10 ~ .,
+             data = train1, 
+             method = "rf", 
+             ntree = 500,
+             verbose = TRUE,
+             tuneGrid = fit$bestTune,
+             min_n = 5)
+
+#fit_final
+
+confusionMatrix(predict(fit_final, test1),factor(test1$Top_10))
+
+plot(varImp(fit, scale= TRUE))
+
+```
+
+## Analysis of Northern Trust Tournament
+
+For the Northern Trust metrics that were highly correlated with a top 25 finish were SG OTT, Average SG Putt, Average Score, and SG ARG. Whereas, for a top 10 finish in the same tournament the leading indicators were Average Score, SG OTT, SG APR, and Average Distance. Here we see a difference in correlated metrics for certain finishes in the Northern Trust. Metrics correlated with a top 25 finish were more focused on metrics revolving a players short game (around the green and putting) where as the metrics correlated with a top 10 finish had more driving centered metrics (SG OTT, Distance). These differences in metrics oppose the old quote in golf "drive for show putt for dough".
+
+
+Top 25 for BMW Championship Results:
+
+```{r, include=FALSE}
+BMW25 = BMW2%>%
+  select(-Top_10)
+
+BMW25 = BMW25%>%
+  select(-`Average SG Total`)
+
+set.seed(504) 
+
+ctrl <- trainControl(method = "cv", number = 5)
+
+
+index <- createDataPartition(BMW25$Top_25, p = 0.80, list = FALSE)
+train <- BMW25[ index, ]
+test <- BMW25[-index, ]
+
+# set method to random forest
+fit <- train(Top_25 ~ .,
+             data = train, 
+             trControl = ctrl,
+             method = "rf", 
+             metric = "Kappa",  
+             tuneLength = 5, 
+             ntree = 500,
+             verbose = TRUE)
+
+fit
+
+
+pred <- predict(fit, newdata=test)
+
+confusionMatrix(as.factor(pred),factor(test$Top_25))
+
+
+print(fit$bestTune)
+
+
+
+```
+
+```{r, echo=FALSE}
+set.seed(504) 
+
+index1 <- createDataPartition(BMW25$Top_25, p = 0.50, list = FALSE)
+train1 <- BMW25[ index1, ]
+test1 <- BMW25[-index1, ]
+
+
+fit_final <- train(Top_25 ~ .,
+             data = train1, 
+             method = "rf", 
+             ntree = 500,
+             verbose = TRUE,
+             tuneGrid = fit$bestTune,
+             min_n = 5)
+
+fit_final
+
+confusionMatrix(predict(fit_final, test1),factor(test1$Top_25))
+
+plot(varImp(fit, scale= TRUE))
+
+```
+
+Top 10 for BMW Chamionship Results:
+
+```{r, include=FALSE}
+
+library(caret)
+
+BMW10 = BMW2%>%
+  select(-Top_25)
+
+BMW10 = BMW10%>%
+  select(-`Average SG Total`)
+
+set.seed(504) 
+
+ctrl <- trainControl(method = "cv", number = 5)
+
+
+index <- createDataPartition(BMW10$Top_10, p = 0.5, list = FALSE)
+train <- BMW10[ index, ]
+test <- BMW10[-index, ]
+
+# set method to random forest
+fit <- train(Top_10 ~ .,
+             data = train, 
+             trControl = ctrl,
+             method = "rf", 
+             metric = "Kappa",  
+             tuneLength = 5, 
+             ntree = 500,
+             verbose = TRUE)
+
+fit
+
+
+pred <- predict(fit, newdata=test)
+
+confusionMatrix(as.factor(pred),factor(test$Top_10))
+
+
+print(fit$bestTune)
+
+
+```
+
+```{r, echo=FALSE}
+set.seed(504) 
+
+index1 <- createDataPartition(BMW10$Top_10, p = 0.650, list = FALSE)
+train1 <- BMW10[ index1, ]
+test1 <- BMW10[-index1, ]
+
+
+fit_final <- train(Top_10 ~ .,
+             data = train1, 
+             method = "rf", 
+             ntree = 500,
+             verbose = TRUE,
+             tuneGrid = fit$bestTune,
+             min_n = 5)
+
+fit_final
+
+confusionMatrix(predict(fit_final, test1),factor(test1$Top_10))
+
+plot(varImp(fit, scale= TRUE))
+
+
+```
+
+## Analysis for BMW Championship
+
+For the BMW Championship Average Score was the most significant feature in predicting both a top 25 and top 10 finish which logically makes sense. Player's that have performed the best throughout the season will likely perform well at this tournament. It is interesting to note that for a top 25 finish aside from Average Score there were primarily two metrics correlated with that finish. These being SG APR and SG OTT. Where as for a top 10 finish there were more metrics with high importances. This intuitively makes sense because for a player to finish better they are going to need to perform well in all areas of their game as opposed to just driving and approach shots.
+
+## Discussion
+
+If you were a player or coach of a player on the PGA Tour you could use these insights to tune up their game for certain tournaments. For example stroked gained approach and strokes gained off the tee were highly correlated with good finishes for the BMW Championship. So players could tweak their practice schedule leading up to the tournament to spend more time working on driving the golf ball (which relates to SG OTT) and iron/wedge practice (which relates to SG APR). It is important to note that the findings are not causal it does not mean that these metrics cause players to finish well but it just suggests that there is a relationship between these metrics and these specific finishes.
+
+Also, from the perspective of an analyst, or sports bettor you could use the insights for making predictions on how well a player will finish in a specific tournament. It is significant to note that as the finishes get better we inevitibly lose some of our predictive power. This can be seen in the graph below where it illustrates the four case study models above.
+
+```{r, echo=FALSE}
+pp = read_csv('./predictionpower.csv')
+pp %>%
+  ggplot(aes(name, kappa)) +
+  geom_col()+
+  theme_classic()+
+  xlab('Tournament and Finish')
+```
+
+Knowing this specifically from the lense of a sports bettor it is crucial that when placing bets on a Top x finish that you are aware of what predictive power you have. And that the odds for that specific bet must be reflective of your predictive power. 
+
+## Conclusion
+
+With these models I was able to draw some insights for specific playoff tournaments on the PGA Tour. Moving forward it would be refreshing for the PGA Tour to make their ShotLink data publically accessible for not only fans but for players as well. A majority of sports are becoming data centric in terms of decision making for certain matchups that can give them a competetive edge. If the PGA Tour were to do this I believe there would be a new jolt of energy into the sport which many consider to be old fashioned and extremely boring.
+
+
+

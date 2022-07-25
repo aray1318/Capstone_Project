@@ -1,0 +1,216 @@
+---
+
+Drive for Show, Putt for Dough?
+
+Andrew Raymond
+
+---
+
+
+
+<hr />
+<p>Drive for Show, Putt for Dough?</p>
+<p>Andrew Raymond</p>
+<hr />
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>The sport of golf and specifically the PGA Tour and its players undervalue data surrounding player metrics. Other sports use metrics to give players a competitive advantage in certain situations, golf needs to do the same. My goal was to find out which metrics play the most significant role in two of the PGA’s playoff tournaments, The BMW Championship and the Northern Trust. These insights can be used whether you are a coach, player, fan, or even a sports bettor.</p>
+</div>
+<div id="background" class="section level2">
+<h2>Background</h2>
+<p>The metrics used on the PGA Tour are incredibly in depth and powerful yet, they are undoubtedly not used to their fullest potential. Many of the articles on the internet and statistics shown on broadcasts inform the audience on general trends and overall metrics for players. However, shouldn’t the players and audience know what metrics are best suited for specific tournaments on tour. The PGA Tour is very exploratory by simply looking at season long trends, this only tells part of the story. Certain tournaments and courses are undoubtedly tailored to specific play styles. All players should know what metrics are most important for a given tournament in order for them to prepare their game to the best of their ability.</p>
+<p>Some high tier players may already have access to this sort of information solely due to their name and or resources. However, younger or newer players on tour do not. They are fighting just to retain status for the coming year. Players regardless of status deserve equal access to course insides and information regarding which metrics are most important for not only the playoff events but for the other forty-five tournaments each year.</p>
+<p>Another aspect is the viewer. The viewer should have access to the information as well because it makes the avid golf fan more invested and interested in a golf tournament. By making the information public it allows equal access to players and can grow the game and take it to a place it never has before. As it currently stands the PGA Tour has severe restrictions on its data, making it inaccessible to the public. By making the data public it can encourage an entire new crowd to grow the game. Much of professional sports and its excitement in the United States is driven by gambling. Golf comparatively to the other major sports is nowhere near as popular.</p>
+</div>
+<div id="definition-of-metrics" class="section level2">
+<h2>Definition of Metrics</h2>
+<p>In this article I will discuss some of the metrics used to measure a player’s performance. Here is a list with definitions of the metrics that may come up.</p>
+<p>Rounds: Number of competitive tournament rounds played in a year
+Fairway Percentage: Percentage of times your tee shot lands in the fairway (the closely mown area that runs between the tee box and putting green of a golf hole)
+Average Distance: The average distance in yards a player’s tee shot travels
+GIR: Percent in which a player gets the ball reaching the putting surface in two or more strokes less than par, regardless of how it gets there. (Ex: 2 shots or less on a Par 4, 3 shots or less on a Par 5, and 1 shot on a Par 3
+Average Putts: Average number of putts a player has per round
+Average Scrambling: The percent a player makes par or better after missing the green in regulation (GIR explained above)
+Average Score: The average number of strokes per round
+Average SG Putt: Measures how many strokes a player gains (or loses) on the greens compared to the field of players
+SG OTT: Measures how many strokes a player gains (or loses) off the tee compared to the field of players (on all par 4 and 5’s)
+SG APR: Strokes gained: approach-the-green measures player performance on approach shots. Approach shots include all shots that are not from the tee on par-4 and par-5 holes and are not included in strokes gained: around-the-green and strokes gained: putting. Approach shots include tee shots on par-3s.
+SG ARG: Measures player performance on any shot within 30 yards of the edge of the green. This statistic does not include any shots taken on the putting green.</p>
+</div>
+<div id="models" class="section level2">
+<h2>Models</h2>
+<p>I created four final models, two for each tournament I was investigating (BMW Championship &amp; Northern Trust). For each tournament I used the features defined above to predict top 25 and top 10 placements for each tournament.</p>
+<p>Top 25 for Northern Trust Results:</p>
+<pre><code>## Confusion Matrix and Statistics
+## 
+##           Reference
+## Prediction No Yes
+##        No  41  15
+##        Yes  8  13
+##                                           
+##                Accuracy : 0.7013          
+##                  95% CI : (0.5862, 0.8003)
+##     No Information Rate : 0.6364          
+##     P-Value [Acc &gt; NIR] : 0.1428          
+##                                           
+##                   Kappa : 0.3181          
+##                                           
+##  Mcnemar&#39;s Test P-Value : 0.2109          
+##                                           
+##             Sensitivity : 0.8367          
+##             Specificity : 0.4643          
+##          Pos Pred Value : 0.7321          
+##          Neg Pred Value : 0.6190          
+##              Prevalence : 0.6364          
+##          Detection Rate : 0.5325          
+##    Detection Prevalence : 0.7273          
+##       Balanced Accuracy : 0.6505          
+##                                           
+##        &#39;Positive&#39; Class : No              
+## </code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<p>Top 10 for Northern Trust Results:</p>
+<pre><code>## Confusion Matrix and Statistics
+## 
+##           Reference
+## Prediction  No Yes
+##        No  104  14
+##        Yes   7   5
+##                                           
+##                Accuracy : 0.8385          
+##                  95% CI : (0.7637, 0.8971)
+##     No Information Rate : 0.8538          
+##     P-Value [Acc &gt; NIR] : 0.7385          
+##                                           
+##                   Kappa : 0.2361          
+##                                           
+##  Mcnemar&#39;s Test P-Value : 0.1904          
+##                                           
+##             Sensitivity : 0.9369          
+##             Specificity : 0.2632          
+##          Pos Pred Value : 0.8814          
+##          Neg Pred Value : 0.4167          
+##              Prevalence : 0.8538          
+##          Detection Rate : 0.8000          
+##    Detection Prevalence : 0.9077          
+##       Balanced Accuracy : 0.6000          
+##                                           
+##        &#39;Positive&#39; Class : No              
+## </code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+</div>
+<div id="analysis-of-northern-trust-tournament" class="section level2">
+<h2>Analysis of Northern Trust Tournament</h2>
+<p>For the Northern Trust metrics that were highly correlated with a top 25 finish were SG OTT, Average SG Putt, Average Score, and SG ARG. Whereas, for a top 10 finish in the same tournament the leading indicators were Average Score, SG OTT, SG APR, and Average Distance. Here we see a difference in correlated metrics for certain finishes in the Northern Trust. Metrics correlated with a top 25 finish were more focused on metrics revolving a players short game (around the green and putting) where as the metrics correlated with a top 10 finish had more driving centered metrics (SG OTT, Distance). These differences in metrics oppose the old quote in golf “drive for show putt for dough”.</p>
+<p>Top 25 for BMW Championship Results:</p>
+<pre><code>## Random Forest 
+## 
+## 98 samples
+## 11 predictors
+##  2 classes: &#39;No&#39;, &#39;Yes&#39; 
+## 
+## No pre-processing
+## Resampling: Bootstrapped (25 reps) 
+## Summary of sample sizes: 98, 98, 98, 98, 98, 98, ... 
+## Resampling results:
+## 
+##   Accuracy   Kappa     
+##   0.5306857  0.03160571
+## 
+## Tuning parameter &#39;mtry&#39; was held constant at a value of 6</code></pre>
+<pre><code>## Confusion Matrix and Statistics
+## 
+##           Reference
+## Prediction No Yes
+##        No  44  17
+##        Yes 11  25
+##                                           
+##                Accuracy : 0.7113          
+##                  95% CI : (0.6105, 0.7989)
+##     No Information Rate : 0.567           
+##     P-Value [Acc &gt; NIR] : 0.002434        
+##                                           
+##                   Kappa : 0.402           
+##                                           
+##  Mcnemar&#39;s Test P-Value : 0.344704        
+##                                           
+##             Sensitivity : 0.8000          
+##             Specificity : 0.5952          
+##          Pos Pred Value : 0.7213          
+##          Neg Pred Value : 0.6944          
+##              Prevalence : 0.5670          
+##          Detection Rate : 0.4536          
+##    Detection Prevalence : 0.6289          
+##       Balanced Accuracy : 0.6976          
+##                                           
+##        &#39;Positive&#39; Class : No              
+## </code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<p>Top 10 for BMW Chamionship Results:</p>
+<pre><code>## Random Forest 
+## 
+## 128 samples
+##  11 predictor
+##   2 classes: &#39;No&#39;, &#39;Yes&#39; 
+## 
+## No pre-processing
+## Resampling: Bootstrapped (25 reps) 
+## Summary of sample sizes: 128, 128, 128, 128, 128, 128, ... 
+## Resampling results:
+## 
+##   Accuracy   Kappa     
+##   0.8131742  0.06613898
+## 
+## Tuning parameter &#39;mtry&#39; was held constant at a value of 4</code></pre>
+<pre><code>## Confusion Matrix and Statistics
+## 
+##           Reference
+## Prediction No Yes
+##        No  56   6
+##        Yes  2   3
+##                                          
+##                Accuracy : 0.8806         
+##                  95% CI : (0.7782, 0.947)
+##     No Information Rate : 0.8657         
+##     P-Value [Acc &gt; NIR] : 0.4461         
+##                                          
+##                   Kappa : 0.3679         
+##                                          
+##  Mcnemar&#39;s Test P-Value : 0.2888         
+##                                          
+##             Sensitivity : 0.9655         
+##             Specificity : 0.3333         
+##          Pos Pred Value : 0.9032         
+##          Neg Pred Value : 0.6000         
+##              Prevalence : 0.8657         
+##          Detection Rate : 0.8358         
+##    Detection Prevalence : 0.9254         
+##       Balanced Accuracy : 0.6494         
+##                                          
+##        &#39;Positive&#39; Class : No             
+## </code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+</div>
+<div id="analysis-for-bmw-championship" class="section level2">
+<h2>Analysis for BMW Championship</h2>
+<p>For the BMW Championship Average Score was the most significant feature in predicting both a top 25 and top 10 finish which logically makes sense. Player’s that have performed the best throughout the season will likely perform well at this tournament. It is interesting to note that for a top 25 finish aside from Average Score there were primarily two metrics correlated with that finish. These being SG APR and SG OTT. Where as for a top 10 finish there were more metrics with high importances. This intuitively makes sense because for a player to finish better they are going to need to perform well in all areas of their game as opposed to just driving and approach shots.</p>
+</div>
+<div id="discussion" class="section level2">
+<h2>Discussion</h2>
+<p>If you were a player or coach of a player on the PGA Tour you could use these insights to tune up their game for certain tournaments. For example stroked gained approach and strokes gained off the tee were highly correlated with good finishes for the BMW Championship. So players could tweak their practice schedule leading up to the tournament to spend more time working on driving the golf ball (which relates to SG OTT) and iron/wedge practice (which relates to SG APR). It is important to note that the findings are not causal it does not mean that these metrics cause players to finish well but it just suggests that there is a relationship between these metrics and these specific finishes.</p>
+<p>Also, from the perspective of an analyst, or sports bettor you could use the insights for making predictions on how well a player will finish in a specific tournament. It is significant to note that as the finishes get better we inevitibly lose some of our predictive power. This can be seen in the graph below where it illustrates the four case study models above.</p>
+<pre><code>## Rows: 4 Columns: 3
+## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr (1): name
+## dbl (2): accuracy, kappa
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<p>Knowing this specifically from the lense of a sports bettor it is crucial that when placing bets on a Top x finish that you are aware of what predictive power you have. And that the odds for that specific bet must be reflective of your predictive power.</p>
+</div>
+<div id="conclusion" class="section level2">
+<h2>Conclusion</h2>
+<p>With these models I was able to draw some insights for specific playoff tournaments on the PGA Tour. Moving forward it would be refreshing for the PGA Tour to make their ShotLink data publically accessible for not only fans but for players as well. A majority of sports are becoming data centric in terms of decision making for certain matchups that can give them a competetive edge. If the PGA Tour were to do this I believe there would be a new jolt of energy into the sport which many consider to be old fashioned and extremely boring.</p>
+</div>
